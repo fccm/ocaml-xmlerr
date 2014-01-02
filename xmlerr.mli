@@ -24,6 +24,7 @@ val parse_f : 'a -> (t -> 'a -> 'a) -> src -> 'a
 val parse_string : string -> t list
 
 val strip_white : t list -> t list
+(** remove whitespace from beginning and ending of PCData *)
 
 val x_lowercase : t list -> t list
 (** translate tag names and attr names to lowercase *)
