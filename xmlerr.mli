@@ -33,5 +33,4 @@ val read_file : string -> string
 
 val print : t list -> unit
 (**/**)
-val print_debug : t list -> unit
 val parse_file : filename:string -> t list
