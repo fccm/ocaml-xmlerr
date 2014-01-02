@@ -57,7 +57,7 @@ uninstall:
 	rmdir $(DESTDOC)
 
 clean:
-	rm -f *.[oa] *.cm[ioax] *.{cmxa,cmxs,so,opt,byte}
+	rm -f *.[oa] *.so *.cm[ioax] *.cmx[as] *.opt *.byte
 	rm -f $(TMP_FILE)
 
 .PHONY: clean test all byte opt install
