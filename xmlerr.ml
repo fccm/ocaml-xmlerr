@@ -384,7 +384,9 @@ let print_debug xs =
       print_string name;
       print_string ")\n";
   | Data d ->
+      print_string "<[[\n";
       print_string d;
+      print_string "\n]]>";
       print_char '\n';
   | Comm c ->
       print_string "\n=={{\n";
@@ -426,6 +428,26 @@ let print xs =
     ) attrs
   in
   let rec print_x = function
+  | Tag (name1, attrs) ::
+    ETag (name2) :: xs ->
+      if name1 = name2 then
+        begin
+          print_char '<';
+          print_string name1;
+          print_attrs attrs;
+          print_string "/>";
+          print_x xs
+        end
+      else
+        begin
+          print_char '<';
+          print_string name1;
+          print_attrs attrs;
+          print_string "></";
+          print_string name2;
+          print_char '>';
+          print_x xs
+        end
   | Tag (name, attrs) :: xs ->
       print_char '<';
       print_string name;
