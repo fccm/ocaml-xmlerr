@@ -60,4 +60,24 @@ clean:
 	rm -f *.[oa] *.so *.cm[ioax] *.cmx[as] *.opt *.byte
 	rm -f $(TMP_FILE)
 
-.PHONY: clean test all byte opt install
+VERSION="0.03"
+FILES=         \
+  xmlerr.ml    \
+  xmlerr.mli   \
+  Makefile     \
+  test.ml      \
+  README.txt   \
+  index.html   \
+  META
+
+DIR="xmlerr-$(VERSION)"
+dist:
+	mkdir -p $(DIR)
+	cp -f $(FILES) $(DIR)/
+	sed -i -e "s/@VERSION@/$(VERSION)/g" $(DIR)/META
+	tar cf $(DIR).tar $(DIR)
+	lzma --best $(DIR).tar
+	ls -lh $(DIR).tar.lzma
+	md5sum $(DIR).tar.lzma
+
+.PHONY: clean test all dist byte opt install
