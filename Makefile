@@ -49,6 +49,12 @@ install: xmlerr.cmi
 	test -f xmlerr.cmxs && install -m 644 xmlerr.cmxs $(DESTDIR)/ || :
 	install -m 644 README.txt $(DESTDOC)/
 
+uninstall:
+	rm -rf $(DESTDIR)/*
+	rm -rf $(DESTDOC)/*
+	rmdir $(DESTDIR)
+	rmdir $(DESTDOC)
+
 clean:
 	rm -f *.[oa] *.cm[ioax] *.{cmxa,cmxs,so,opt,byte}
 	rm -f $(TMP_FILE)
