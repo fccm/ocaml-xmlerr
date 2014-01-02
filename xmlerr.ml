@@ -13,23 +13,49 @@
 type attr = string * string
 type t = Tag of string * attr list | ETag of string | Data of string | Comm of string
 
+type src = { len: unit -> int; get_char: int -> char; sub: int -> int -> string }
+
 let get_char = String.unsafe_get
 let set_char = String.unsafe_set
 
-let index str len i c =
+let str_sub str ofs len =  (* String.unsafe_sub *)
+  let s = String.create len in
+  String.unsafe_blit str ofs s 0 len;
+  s
+
+let string_input str =
+  let len = String.length str in
+  { len = (fun () -> len);
+    get_char = String.unsafe_get str;
+    sub = str_sub str }
+
+let ic_input ic =
+  let len = in_channel_length ic in
+  { len = (fun () -> len);
+    get_char = (fun i -> seek_in ic i; input_char ic);
+    sub =
+      (fun ofs len ->
+        seek_in ic ofs;
+        let buf = String.create len in
+        let got = input ic buf 0 len in
+        if got = len then (buf)
+        else String.sub buf 0 got)
+  }
+
+let index s i c =
   let rec aux i =
-    if i = len then None else
-    let c' = get_char str i in
+    if i = s.len() then None else
+    let c' = s.get_char i in
     if c = c' then Some i
     else aux (succ i)
   in
   aux i
 
 type p = Fst of int | Snd of int | Thd of int | Not
-let index_any str len i (c1, c2, c3) =
+let index_any s i (c1, c2, c3) =
   let rec aux i =
-    if i = len then Not else
-    let c' = get_char str i in
+    if i = s.len() then Not else
+    let c' = s.get_char i in
     if c1 = c' then Fst i else
     if c2 = c' then Snd i else
     if c3 = c' then Thd i else
@@ -37,12 +63,12 @@ let index_any str len i (c1, c2, c3) =
   in
   aux i
 
-let rec index_no_esc str len i c =
-  match index str len i c with
+let rec index_no_esc s i c =
+  match index s i c with
   | Some i ->
-      let prev = get_char str (pred i) in
+      let prev = s.get_char (pred i) in
       if prev = '\\'
-      then index_no_esc str len (succ i) c
+      then index_no_esc s (succ i) c
       else Some i
   | None -> None
 
@@ -50,20 +76,20 @@ let is_white = function
   | ' ' | '\n' | '\t' | '\r' -> true
   | _ -> false
 
-let next_not_white str len i =
+let next_not_white s i =
   let rec aux i =
-    if i = len then None else
-    match get_char str i with
+    if i = s.len() then None else
+    match s.get_char i with
     | ' ' | '\n' | '\t' | '\r' -> aux (succ i)
     | c -> Some(c, i)
   in
   aux i
 
 type n = End | White of int | Alt of int
-let next_white_or str len i c =
+let next_white_or s i c =
   let rec aux i =
-    if i = len then End else
-    match get_char str i with
+    if i = s.len() then End else
+    match s.get_char i with
     | ' ' | '\n' | '\t' | '\r' -> White i
     | c' ->
         if c = c' then Alt i
@@ -76,16 +102,17 @@ let opt_last = function "" -> None
 
 let some = function Some v -> v | _ -> invalid_arg "some"
 
-let parse_rev str =
-  let len = String.length str in
+
+let parse_f init f s =
   let next = function
     | Some i ->
-        if i = len then None
-        else Some(succ i)
+        let ni = succ i in
+        if ni >= s.len() then None
+        else (Some ni)
     | None -> None
   in
   let get = function
-    | Some i -> Some(get_char str i)
+    | Some i -> Some(s.get_char i)
     | None -> None
   in
 
@@ -95,7 +122,7 @@ let parse_rev str =
         if is_white c
         then eat_white (next si)
         else (some si)
-    | None -> pred len
+    | None -> pred(s.len())
   in
   let rec across_white si =
     match get si with
@@ -114,46 +141,46 @@ let parse_rev str =
     | Some ('\'' as c) ->
         let i1 = succ(some si) in
         let i2 =
-          match index_no_esc str len i1 c with
+          match index_no_esc s i1 c with
           | Some i -> i
-          | None -> pred len
+          | None -> pred(s.len())
         in
-        let v = String.sub str i1 (i2 - i1) in
+        let v = s.sub i1 (i2 - i1) in
         (v, next(Some i2))
     | Some c ->  (* old fashion html *)
         let i1 = some si in
         let i2 =
-          match next_white_or str len i1 '>' with
+          match next_white_or s i1 '>' with
           | White i -> i
           | Alt i -> i
-          | End -> pred len  (* err *)
+          | End -> pred(s.len())  (* err *)
         in
-        let v = String.sub str i1 (i2 - i1) in
+        let v = s.sub i1 (i2 - i1) in
         (v, Some i2)
   in
 
   let rec get_attr acc i =
-    match next_not_white str len i with
+    match next_not_white s i with
     | None ->
         (acc, None)  (* err *)
     | Some('>', i) ->
         (acc, Some i)
     (* TODO
     | Some('/', i) ->
-        begin match next_not_white str len (succ i) with
+        begin match next_not_white s (succ i) with
         | Some('>', i) -> (acc, Some i)
         | _ -> (acc, Some i)  (* err *)
         end
     *)
     | Some(_, i1) ->
         let i2, (attr_value, si) =
-          match index_any str len i1 ('=', '>', ' ') with
+          match index_any s i1 ('=', '>', ' ') with
           | Fst i -> (i, get_attr_value (next(Some i)))
           | Snd i -> (i, ("", Some i))
           | Thd i -> (i, ("", Some i))
-          | Not -> (pred len, ("", None))  (* err *)
+          | Not -> (pred(s.len()), ("", None))  (* err *)
         in
-        let attr_name = String.sub str i1 (i2 - i1) in
+        let attr_name = s.sub i1 (i2 - i1) in
         let acc = (attr_name, attr_value)::acc in
         match si with
         | Some i -> get_attr acc i
@@ -172,18 +199,18 @@ let parse_rev str =
     | Some c ->
         let i1 = eat_white si in
         let i2, (attrs, si) =
-          match next_white_or str len i1 '>' with
+          match next_white_or s i1 '>' with
           | White i -> (i, get_attrs i)
           | Alt i -> i, ([], Some i)
-          | End -> pred len, ([], None)
+          | End -> pred(s.len()), ([], None)  (* err *)
         in
         let tag =
           match get (Some i1), attrs with
           | Some '/', [] ->
-              let name = String.sub str (i1+1) (i2 - i1 - 1) in
+              let name = s.sub (i1+1) (i2 - i1 - 1) in
               ETag (name)
           | _ ->
-              let name = String.sub str i1 (i2 - i1) in
+              let name = s.sub i1 (i2 - i1) in
               Tag (name, attrs)
         in
         Some(tag, si)
@@ -192,13 +219,13 @@ let parse_rev str =
   let get_data si =
     let i1 = some si in
     let i2 =
-      match index str len i1 '<' with
+      match index s i1 '<' with
       | Some i -> pred i
-      | None -> pred len
+      | None -> pred(s.len())
     in
     let len = (1 + i2 - i1) in
     if len <= 0 then None else
-      let data = String.sub str i1 len in
+      let data = s.sub i1 len in
       Some(Data data, Some i2)
   in
 
@@ -218,8 +245,8 @@ let parse_rev str =
   in
 
   let rec scroll_comment i =
-    match index str len i '-' with
-    | None -> (pred len, None)
+    match index s i '-' with
+    | None -> (pred(s.len()), None)  (* err *)
     | (Some i) as si ->
         match is_end_of_comment (next si) with
         | Some si -> (pred i, si)
@@ -229,7 +256,7 @@ let parse_rev str =
     match si with
     | Some i1 ->
         let i2, si = scroll_comment i1 in
-        Some(String.sub str i1 (i2 - i1 + 1), si)
+        Some(s.sub i1 (i2 - i1 + 1), si)
     | None -> None
   in
 
@@ -239,17 +266,19 @@ let parse_rev str =
     | [] -> None, []
   in
 
-  (* this is a dirty fix (should be temp) *)
+  (* this is a dirty fix (should find a more elegant solution) *)
   let check_closing acc = function
     | Tag(name, attrs) as tag ->
-      ( if opt_last name = (Some '/') then 
+        if opt_last name = (Some '/') then 
           let sname = String.sub name 0 (String.length name - 1) in
-          (ETag sname) :: Tag(sname, attrs) :: acc
-        else match list_last [] attrs with
+          f (ETag sname) (f (Tag(sname, attrs)) acc)
+        else begin
+          match list_last [] attrs with
           | Some("/",""), attrs ->
-              (ETag name) :: Tag(name, attrs) :: acc
-          | _ -> (tag :: acc) )
-    | x -> (x :: acc)
+              f (ETag name) (f (Tag(name, attrs)) acc)
+          | _ -> (f tag acc)
+        end
+    | x -> (f x acc)
   in
 
   let rec loop acc si =
@@ -259,7 +288,7 @@ let parse_rev str =
         | Some si ->
             begin match get_comment si with
             | Some(comm, si) ->
-                loop ((Comm comm)::acc) (next si)
+                loop (f (Comm comm) acc) (next si)
             | None -> (acc)
             end
         | None ->
@@ -272,14 +301,17 @@ let parse_rev str =
     | Some _ ->
         begin match get_data si with
         | Some(data, si) ->
-            loop (data::acc) (next si)
+            loop (f data acc) (next si)
         | None -> (acc)
         end
     | None -> (acc)
   in
-  loop [] (Some 0)
+  loop init (Some 0)
 
-let parse str = List.rev(parse_rev str)
+let cons x xs = x::xs
+let parse_rev s = parse_f [] cons s
+let parse s = List.rev(parse_rev s)
+let parse_string s = parse (string_input s)
 
 let gt = ( > )
 let lt = ( < )
@@ -393,24 +425,29 @@ let print xs =
           | _ -> Printf.printf " %s=\"%s\"" key (String.escaped value)
     ) attrs
   in
-  let print_x = function
-  | Tag (name, attrs) ->
+  let rec print_x = function
+  | Tag (name, attrs) :: xs ->
       print_char '<';
       print_string name;
       print_attrs attrs;
       print_char '>';
-  | ETag (name) ->
+      print_x xs
+  | ETag (name) :: xs ->
       print_string "</";
       print_string name;
       print_char '>';
-  | Data d ->
+      print_x xs
+  | Data d :: xs ->
       print_string d;
-  | Comm c ->
+      print_x xs
+  | Comm c :: xs ->
       print_string "<!--";
       print_string c;
       print_string "-->";
+      print_x xs
+  | [] -> ()
   in
-  List.iter print_x xs;
+  print_x xs;
   print_newline()
 
 let read_file f =
@@ -421,3 +458,5 @@ let read_file f =
   close_in ic;
   (s)
 
+let parse_file ~filename:f =
+  parse_string (read_file f)

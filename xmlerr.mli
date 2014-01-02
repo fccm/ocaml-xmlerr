@@ -13,8 +13,15 @@
 type attr = string * string
 type t = Tag of string * attr list | ETag of string | Data of string | Comm of string
 
-val parse : string -> t list
-val parse_rev : string -> t list
+type src = { len: unit -> int; get_char: int -> char; sub: int -> int -> string }
+
+val string_input: string -> src
+val ic_input: in_channel -> src
+
+val parse : src -> t list
+val parse_rev : src -> t list
+val parse_f : 'a -> (t -> 'a -> 'a) -> src -> 'a
+val parse_string : string -> t list
 
 val strip_white : t list -> t list
 
@@ -26,3 +33,4 @@ val read_file : string -> string
 val print : t list -> unit
 (**/**)
 val print_debug : t list -> unit
+val parse_file : filename:string -> t list
