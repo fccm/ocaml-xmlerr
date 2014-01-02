@@ -11,9 +11,17 @@
 *)
 
 type attr = string * string
-type t = Tag of string * attr list | ETag of string | Data of string | Comm of string
+type t =
+  | Tag of string * attr list
+  | ETag of string
+  | Data of string
+  | Comm of string
 
-type src = { len: unit -> int; get_char: int -> char; sub: int -> int -> string }
+type src = {
+  len: unit -> int;
+  get_char: int -> char;
+  sub: int -> int -> string;
+}
 
 let get_char = String.unsafe_get
 let set_char = String.unsafe_set
