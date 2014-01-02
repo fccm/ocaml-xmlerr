@@ -45,6 +45,7 @@ install: xmlerr.cmi
 	test -f xmlerr.cmo  && install -m 644 xmlerr.cmo  $(DESTDIR)/ || :
 	test -f xmlerr.cma  && install -m 644 xmlerr.cma  $(DESTDIR)/ || :
 	test -f xmlerr.cmo  && install -m 644 xmlerr.cmo  $(DESTDIR)/ || :
+	test -f xmlerr.cmx  && install -m 644 xmlerr.cmx  $(DESTDIR)/ || :
 	test -f xmlerr.cmxa && install -m 644 xmlerr.cmxa $(DESTDIR)/ || :
 	test -f xmlerr.cmxs && install -m 644 xmlerr.cmxs $(DESTDIR)/ || :
 	install -m 644 README.txt $(DESTDOC)/
