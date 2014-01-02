@@ -21,10 +21,10 @@ xmlerr.cmx: xmlerr.ml xmlerr.cmi
 	ocamlopt -c $<
 
 xmlerr.cma: xmlerr.cmo
-	ocamlmklib $< -o xmlerr
+	ocamlc -a -o $@ $<
 
 xmlerr.cmxa: xmlerr.cmx
-	ocamlmklib $< -o xmlerr
+	ocamlopt -a -o $@ $<
 
 xmlerr.cmxs: xmlerr.ml
 	ocamlopt -shared $< -o $@ && strip $@
