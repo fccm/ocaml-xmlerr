@@ -1,5 +1,7 @@
+OCAMLC := ocamlc
+OCAMLOPT := ocamlopt
 DIR := xmlerr
-OCAMLDIR := $(shell ocamlc -where)
+OCAMLDIR := $(shell $(OCAMLC) -where)
 DESTDIR := $(OCAMLDIR)/$(DIR)
 DOCDIR := /usr/share/doc
 DESTDOC := $(DOCDIR)/$(DIR)
@@ -12,22 +14,22 @@ cmxa: xmlerr.cmxa
 
 
 xmlerr.cmi: xmlerr.mli
-	ocamlc -c $<
+	$(OCAMLC) -c $<
 
 xmlerr.cmo: xmlerr.ml xmlerr.cmi
-	ocamlc -c $<
+	$(OCAMLC) -c $<
 
 xmlerr.cmx: xmlerr.ml xmlerr.cmi
-	ocamlopt -c $<
+	$(OCAMLOPT) -c $<
 
 xmlerr.cma: xmlerr.cmo
-	ocamlc -a -o $@ $<
+	$(OCAMLC) -a -o $@ $<
 
 xmlerr.cmxa: xmlerr.cmx
-	ocamlopt -a -o $@ $<
+	$(OCAMLOPT) -a -o $@ $<
 
 xmlerr.cmxs: xmlerr.ml
-	ocamlopt -shared $< -o $@ && strip $@
+	$(OCAMLOPT) -shared $< -o $@ && strip $@
 
 HTML := ./index.html
 TMP_FILE := log.tmp
@@ -56,10 +58,10 @@ uninstall:
 	rmdir $(DESTDOC)
 
 clean:
-	rm -f *.[oa] *.so *.cm[ioax] *.cmx[as] *.opt *.byte
-	rm -f $(TMP_FILE)
+	$(RM) *.[oa] *.so *.cm[ioax] *.cmx[as] *.opt *.byte
+	$(RM) $(TMP_FILE)
 
-VERSION="0.03"
+VERSION := $(shell date --iso)
 FILES=         \
   xmlerr.ml    \
   xmlerr.mli   \
