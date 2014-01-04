@@ -52,7 +52,7 @@ let ic_input ic =
 
 let index s i c =
   let rec aux i =
-    if i = s.len() then None else
+    if i = s.len () then None else
     let c' = s.get_char i in
     if c = c' then Some i
     else aux (succ i)
@@ -62,7 +62,7 @@ let index s i c =
 type p = Fst of int | Snd of int | Thd of int | Not
 let index_any s i (c1, c2, c3) =
   let rec aux i =
-    if i = s.len() then Not else
+    if i = s.len () then Not else
     let c' = s.get_char i in
     if c1 = c' then Fst i else
     if c2 = c' then Snd i else
@@ -86,7 +86,7 @@ let is_white = function
 
 let next_not_white s i =
   let rec aux i =
-    if i = s.len() then None else
+    if i = s.len () then None else
     match s.get_char i with
     | ' ' | '\n' | '\t' | '\r' -> aux (succ i)
     | c -> Some(c, i)
@@ -96,7 +96,7 @@ let next_not_white s i =
 type n = End | White of int | Alt of int
 let next_white_or s i c =
   let rec aux i =
-    if i = s.len() then End else
+    if i = s.len () then End else
     match s.get_char i with
     | ' ' | '\n' | '\t' | '\r' -> White i
     | c' ->
@@ -115,7 +115,7 @@ let parse_f init f s =
   let next = function
     | Some i ->
         let ni = succ i in
-        if ni >= s.len() then None
+        if ni >= s.len () then None
         else (Some ni)
     | None -> None
   in
@@ -130,7 +130,7 @@ let parse_f init f s =
         if is_white c
         then eat_white (next si)
         else (some si)
-    | None -> pred(s.len())
+    | None -> pred(s.len ())
   in
   let rec across_white si =
     match get si with
@@ -151,7 +151,7 @@ let parse_f init f s =
         let i2 =
           match index_no_esc s i1 c with
           | Some i -> i
-          | None -> pred(s.len())
+          | None -> pred(s.len ())
         in
         let v = s.sub i1 (i2 - i1) in
         (v, next(Some i2))
@@ -161,7 +161,7 @@ let parse_f init f s =
           match next_white_or s i1 '>' with
           | White i -> i
           | Alt i -> i
-          | End -> pred(s.len())  (* err *)
+          | End -> pred(s.len ())  (* err *)
         in
         let v = s.sub i1 (i2 - i1) in
         (v, Some i2)
@@ -186,7 +186,7 @@ let parse_f init f s =
           | Fst i -> (i, get_attr_value (next(Some i)))
           | Snd i -> (i, ("", Some i))
           | Thd i -> (i, ("", Some i))
-          | Not -> (pred(s.len()), ("", None))  (* err *)
+          | Not -> (pred(s.len ()), ("", None))  (* err *)
         in
         let attr_name = s.sub i1 (i2 - i1) in
         let acc = (attr_name, attr_value)::acc in
@@ -210,7 +210,7 @@ let parse_f init f s =
           match next_white_or s i1 '>' with
           | White i -> (i, get_attrs i)
           | Alt i -> i, ([], Some i)
-          | End -> pred(s.len()), ([], None)  (* err *)
+          | End -> pred(s.len ()), ([], None)  (* err *)
         in
         let tag =
           match get (Some i1), attrs with
@@ -229,7 +229,7 @@ let parse_f init f s =
     let i2 =
       match index s i1 '<' with
       | Some i -> pred i
-      | None -> pred(s.len())
+      | None -> pred(s.len ())
     in
     let len = (1 + i2 - i1) in
     if len <= 0 then None else
@@ -254,7 +254,7 @@ let parse_f init f s =
 
   let rec scroll_comment i =
     match index s i '-' with
-    | None -> (pred(s.len()), None)  (* err *)
+    | None -> (pred(s.len ()), None)  (* err *)
     | (Some i) as si ->
         match is_end_of_comment (next si) with
         | Some si -> (pred i, si)
