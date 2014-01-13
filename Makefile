@@ -31,14 +31,14 @@ xmlerr.cmxa: xmlerr.cmx
 xmlerr.cmxs: xmlerr.ml
 	$(OCAMLOPT) -shared $< -o $@ && strip $@
 
-HTML := ./index.html
+HTML_INPUT := ./index.html
 TMP_FILE := log.tmp
 
-$(TMP_FILE): xmlerr.cmo test.ml $(HTML)
+$(TMP_FILE): xmlerr.cmo test.ml $(HTML_INPUT)
 	ocaml $^ > $@
 
 test: $(TMP_FILE)
-	vim $< $(HTML)
+	vim $< $(HTML_INPUT)
 
 install: xmlerr.cmi
 	install -d -m 755 $(DESTDIR)
