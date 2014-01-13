@@ -376,7 +376,7 @@ let x_lowercase =
   in
   aux []
 
-let print xs =
+let print_html xs =
   let is_escaped s c =
     match String.length s with
     | 0 -> true
