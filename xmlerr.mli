@@ -19,8 +19,8 @@ type t =
 
 type src = { len: unit -> int; get_char: int -> char; sub: int -> int -> string }
 
-val string_input: string -> src
-val ic_input: in_channel -> src
+val string_input : string -> src
+val ic_input : in_channel -> src
 
 val parse : src -> t list
 val parse_rev : src -> t list
