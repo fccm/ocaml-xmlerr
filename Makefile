@@ -38,7 +38,7 @@ $(TMP_FILE): xmlerr.cmo test.ml $(HTML_INPUT)
 	ocaml $^ > $@
 
 test: $(TMP_FILE)
-	vim $< $(HTML_INPUT)
+	cat $<
 
 install: xmlerr.cmi
 	install -d -m 755 $(DESTDIR)
