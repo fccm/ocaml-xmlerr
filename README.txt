@@ -15,4 +15,4 @@
   probably not expect too much from it.
 
   If you have any suggestion or comment:
-  Contact: <monnier.florent(_)gmail.com>
+  Contact: <monnier.florent on gmail>
