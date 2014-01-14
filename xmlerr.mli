@@ -26,6 +26,7 @@ val parse : src -> t list
 val parse_rev : src -> t list
 val parse_f : 'a -> (t -> 'a -> 'a) -> src -> 'a
 val parse_string : string -> t list
+val parse_file : filename:string -> t list
 
 val strip_white : t list -> t list
 (** remove whitespace from beginning and ending of PCData *)
@@ -37,6 +38,5 @@ val print_html : t list -> unit
 val print_code : t list -> unit
 
 (**/**)
-val parse_file : filename:string -> t list
 val read_file : string -> string
 
