@@ -452,6 +452,27 @@ let print_html xs =
   print_x xs;
   print_newline()
 
+
+let print_code xs =
+  let print_attr (key, value) =
+    Printf.printf "    (%S, %S);\n" key value
+  in
+  let print_x = function
+  | Tag (name, attrs) ->
+      Printf.printf "  Tag (%S, [\n" name;
+      List.iter print_attr attrs;
+      Printf.printf "  ])\n";
+  | ETag (name) ->
+      Printf.printf "  ETag (%S)\n" name
+  | Data d ->
+      Printf.printf "  Data (%S)\n" d
+  | Comm c ->
+      Printf.printf "  Comm (%S)\n" c
+  in
+  List.iter print_x xs;
+  print_newline()
+
+
 let read_file f =
   let ic = open_in f in
   let n = in_channel_length ic in

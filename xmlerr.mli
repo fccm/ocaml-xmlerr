@@ -36,5 +36,7 @@ val x_lowercase : t list -> t list
 val read_file : string -> string
 
 val print_html : t list -> unit
+val print_code : t list -> unit
+
 (**/**)
 val parse_file : filename:string -> t list
