@@ -483,3 +483,11 @@ let read_file f =
 
 let parse_file ~filename:f =
   parse_string (read_file f)
+
+let input_ic ic =
+  let b = Buffer.create 1024 in
+  try while true do Buffer.add_char b (input_char ic) done; ""
+  with End_of_file -> Buffer.contents b
+
+let parse_ic ic =
+  parse_string (input_ic ic)
