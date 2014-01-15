@@ -491,3 +491,6 @@ let input_ic ic =
 
 let parse_ic ic =
   parse_string (input_ic ic)
+
+let parse_stdin () =
+  parse_ic stdin

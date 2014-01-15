@@ -41,4 +41,5 @@ val print_code : t list -> unit
 val read_file : string -> string
 
 val input_ic : in_channel -> string
+val parse_stdin : unit -> t list
 val parse_ic : in_channel -> t list
