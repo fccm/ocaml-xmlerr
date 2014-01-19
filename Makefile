@@ -6,11 +6,10 @@ DESTDIR := $(OCAMLDIR)/$(DIR)
 DOCDIR := /usr/share/doc
 DESTDOC := $(DOCDIR)/$(DIR)
 
-all: byte opt
-byte: xmlerr.cmo
-opt: xmlerr.cmx
-cma: xmlerr.cma
-cmxa: xmlerr.cmxa
+all: cma cmxa cmxs
+byte cma: xmlerr.cma
+opt cmxa: xmlerr.cmxa
+cmxs: xmlerr.cmxs
 
 
 xmlerr.cmi: xmlerr.mli
@@ -81,4 +80,4 @@ dist:
 	ls -lh $(DIR).tar.lzma
 	md5sum $(DIR).tar.lzma
 
-.PHONY: clean test all dist byte opt install
+.PHONY: clean test all dist byte opt cma cmxa cmxs install
