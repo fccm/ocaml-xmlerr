@@ -11,6 +11,7 @@ byte cma: xmlerr.cma
 opt cmxa: xmlerr.cmxa
 cmxs: xmlerr.cmxs
 
+# Build Xmlerr
 
 xmlerr.cmi: xmlerr.mli
 	$(OCAMLC) -c $<
@@ -29,6 +30,33 @@ xmlerr.cmxa: xmlerr.cmx
 
 xmlerr.cmxs: xmlerr.ml
 	$(OCAMLOPT) -shared $< -o $@ && strip $@
+
+# Utils
+
+utils: \
+  xmlerr_utils.cma \
+  xmlerr_utils.cmxa \
+  xmlerr_utils.cmxs
+
+xmlerr_utils.cmi: xmlerr_utils.mli
+	$(OCAMLC) -c $<
+
+xmlerr_utils.cmo: xmlerr_utils.ml xmlerr_utils.cmi
+	$(OCAMLC) -c $<
+
+xmlerr_utils.cmx: xmlerr_utils.ml xmlerr_utils.cmi
+	$(OCAMLOPT) -c $<
+
+xmlerr_utils.cma: xmlerr_utils.cmo
+	$(OCAMLC) -a -o $@ $<
+
+xmlerr_utils.cmxa: xmlerr_utils.cmx
+	$(OCAMLOPT) -a -o $@ $<
+
+xmlerr_utils.cmxs: xmlerr_utils.ml
+	$(OCAMLOPT) -shared $< -o $@ && strip $@
+
+# Test
 
 HTML_INPUT := ./index.html
 TMP_FILE := log.tmp
@@ -61,14 +89,17 @@ clean:
 	$(RM) $(TMP_FILE)
 
 VERSION := $(shell date --iso)
-FILES=         \
-  xmlerr.ml    \
-  xmlerr.mli   \
-  Makefile     \
-  test.ml      \
-  README.txt   \
-  index.html   \
-  META
+FILES=              \
+  xmlerr.ml         \
+  xmlerr.mli        \
+  xmlerr_utils.mli  \
+  xmlerr_utils.ml   \
+  Makefile          \
+  test.ml           \
+  README.txt        \
+  index.html        \
+  META              \
+  #End
 
 DIR="xmlerr-$(VERSION)"
 dist:
@@ -80,4 +111,4 @@ dist:
 	ls -lh $(DIR).tar.lzma
 	md5sum $(DIR).tar.lzma
 
-.PHONY: clean test all dist byte opt cma cmxa cmxs install
+.PHONY: clean test all dist byte opt cma cmxa cmxs utils install

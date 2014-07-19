@@ -4,3 +4,12 @@ version = "0.04"
 archive(byte) = "xmlerr.cma"
 archive(native) = "xmlerr.cmxa"
 archive(plugin,native) = "xmlerr.cmxs"
+
+package "utils" (
+  exists_if = "xmlerr_utils.cma,xmlerr_utils.cmxa,xmlerr_utils.cmxs"
+  description = "Utils for xmlerr"
+  requires = "xmlerr"
+  archive(byte) = "xmlerr_utils.cma"
+  archive(native) = "xmlerr_utils.cmxa"
+  archive(plugin,native) = "xmlerr_utils.cmxs"
+)
