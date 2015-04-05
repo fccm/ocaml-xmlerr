@@ -1,0 +1,57 @@
+.TH "HTMLXTR" "1" "2012-11-25" "HTML extractor - alpha" "User Command"
+.SH "NAME"
+\fIhtmlxtr\fP \- a simple extractor for HTML from a simple template.
+.
+.SH "SYNOPSIS"
+\fBhtmlxtr\fP
+\fB<template\-file>\fP
+\fB<http\-url>\fP
+.br 
+\fBhtmlxtr\fP
+\fB<template\-file>\fP
+\fB\-\fP
+.PP 
+The output is on \fIstdout\fP.
+.
+.SH "DESCRIPTION"
+\fIhtmlxtr\fP is a simple tool to extract pieces of content from HTML
+pages, using a simple untemplate format.
+.
+.
+.SH "UNTEMPLATING"
+Templates-like are used to match pieces of HTML from the input.
+.br 
+Here is an example:
+  <li><a href="\fB@\fP">\fB@\fP</a></li>
+.PP 
+Applied to this HTML content:
+  <html>
+  <body>
+  <ul>
+    <li><a href="alpha.html">alpha</a></li>
+    <li><a href="beta.html">beta</a></li>
+    <li><a href="gamma.html">gamma</a></li>
+  </ul>
+  </body>
+  </html>
+.PP 
+The output result will be:
+  alpha.html      alpha
+  beta.html       beta
+  gamma.html      gamma
+.PP 
+Each elements are separated by tabulations.
+.
+.SH "SUGGESTIONS"
+Any suggestion to improve this tool would be appreciated.
+.
+.SH "AUTHOR"
+(C) 2012 Florent Monnier
+.
+.SH "LICENSE"
+The code is provided along the MIT license.
+.PP 
+This software is provided "AS\-IS", without warranty of any kind.
+.
+.SH "CONTACT"
+email: <monnier.florent on gmail>

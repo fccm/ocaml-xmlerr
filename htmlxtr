@@ -1,0 +1,27 @@
+#!/usr/bin/env ocaml
+#load "xmlerr.cma"
+#load "xmlerr_utils.cma"
+#directory "./minibot"
+#load "unix.cma"
+#load "http.cmo"
+
+let extract tmpl xs =
+  let tp = Xmlerr.parse_file tmpl in
+  let xs = Xmlerr.strip_white xs in
+  let tp = Xmlerr.strip_white tp in
+  let lst = Xmlerr_utils.extract tp xs in
+  List.iter (fun pats ->
+    print_endline (String.concat "\t" pats)
+  ) lst
+
+let () =
+  let args = List.tl (Array.to_list Sys.argv) in
+  match args with
+  | [tmpl; "-"] ->
+      let xs = Xmlerr.parse_ic stdin in
+      extract tmpl xs
+  | [tmpl; url] ->
+      let _, _, page = Http.make_request ~url () in
+      let xs = Xmlerr.parse_string page in
+      extract tmpl xs
+  | _ -> ()
