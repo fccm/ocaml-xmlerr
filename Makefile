@@ -102,7 +102,7 @@ FILES=              \
   #End
 
 DIR="xmlerr-$(VERSION)"
-dist:
+release:
 	mkdir -p $(DIR)
 	cp -f $(FILES) $(DIR)/
 	sed -i -e "s/@VERSION@/$(VERSION)/g" $(DIR)/META
@@ -111,4 +111,4 @@ dist:
 	ls -lh $(DIR).tar.lzma
 	md5sum $(DIR).tar.lzma
 
-.PHONY: clean test all dist byte opt cma cmxa cmxs utils install
+.PHONY: clean test all release byte opt cma cmxa cmxs utils install
